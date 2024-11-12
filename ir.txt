@@ -1,0 +1,23 @@
+IRSensor
+
+int ir_remote=0;
+void setup()
+{
+  pinMode(13, OUTPUT);
+  pinMode(3,INPUT);
+}
+
+void loop()
+{
+  ir_remote=digitalRead(3);
+  if(ir_remote==LOW){
+    
+  digitalWrite(13, HIGH);
+  delay(1000); // Wait for 1000 millisecond(s)
+  digitalWrite(13, LOW);
+  delay(1000); // Wait for 1000 millisecond(s)
+  }
+  else{
+    digitalWrite(13, LOW);
+  }
+} 
