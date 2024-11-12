@@ -1,0 +1,161 @@
+Page Replacement
+
+//FIFO
+
+#include <iostream>
+using namespace std;
+
+int main() {
+    int pages[] = {7, 0, 1, 2, 0, 3, 0, 4, 2, 3, 0, 3, 2, 1, 2, 0, 1, 7, 0, 1};
+    int n = sizeof(pages) / sizeof(pages[0]);
+    int frame[3] = {-1, -1, -1};  // Fixed frame size of 3, initialized to -1
+    int nextFrame = 0, pageFaults = 0;
+
+    for (int i = 0; i < n; i++) {
+        bool pageFound = false;
+
+        // Check if page is already in frame
+        for (int j = 0; j < 3; j++) {
+            if (frame[j] == pages[i]) {
+                pageFound = true;
+                cout << "Page hit: " << pages[i] << endl;
+                break;
+            }
+        }
+
+        // If page not found, it's a page fault
+        if (!pageFound) {
+            frame[nextFrame] = pages[i];           // Replace page using FIFO order
+            nextFrame = (nextFrame + 1) % 3;       // Update nextFrame index
+            pageFaults++;
+            cout << "Page fault: " << pages[i] << endl;
+        }
+    }
+
+    cout << "Total Page Faults: " << pageFaults << endl;
+    return 0;
+}
+
+//LRU
+
+#include <iostream>
+using namespace std;
+
+int main() {
+    int pages[] = {7, 0, 1, 2, 0, 3, 0, 4, 2, 3, 0, 3, 2, 1, 2, 0, 1, 7, 0, 1};
+    int frameSize = 3;
+    int n = sizeof(pages) / sizeof(pages[0]);
+    int frame[3] = {-1, -1, -1}; // Fixed frame size of 3
+    int lastUsed[3] = {0};       // Track last used indices for LRU
+    int pageFaults = 0;
+
+    for (int i = 0; i < n; i++) {
+        bool pageFound = false;
+
+        // Check if the page is already in the frame
+        for (int j = 0; j < frameSize; j++) {
+            if (frame[j] == pages[i]) {
+                pageFound = true;
+                cout << "Page hit: " << pages[i] << endl;
+                lastUsed[j] = i; // Update the recent access index
+                break;
+            }
+        }
+
+        // If page not found, handle page fault
+        if (!pageFound) {
+            pageFaults++;
+            int lruIndex = 0;
+
+            // Find the LRU page by finding the minimum last used index
+            for (int j = 1; j < frameSize; j++) {
+                if (lastUsed[j] < lastUsed[lruIndex]) {
+                    lruIndex = j;
+                }
+            }
+
+            // Replace the LRU page
+            frame[lruIndex] = pages[i];
+            lastUsed[lruIndex] = i; // Update the last used index
+            cout << "Page fault: " << pages[i] << endl;
+        }
+    }
+
+    cout << "Total Page Faults: " << pageFaults << endl;
+    return 0;
+}
+
+
+//OptimalPR
+
+#include <iostream>
+using namespace std;
+#define MAX_FRAMES 10 
+
+void OptimalPageReplacement(int pages[], int n, int frameSize) {
+    int frame[MAX_FRAMES]; 
+    int pageFaults = 0;    
+    for (int i = 0; i < frameSize; i++) {
+        frame[i] = -1; 
+    }
+
+    for (int i = 0; i < n; i++) {
+        bool pageFound = false; 
+
+
+        for (int j = 0; j < frameSize; j++) {
+            if (frame[j] == pages[i]) {
+                pageFound = true; 
+                break;
+            }
+        }
+
+        if (!pageFound) {
+            int replaceIndex = -1; 
+            int farthest = -1;  
+
+            for (int j = 0; j < frameSize; j++) {
+                if (frame[j] == -1) {
+                    replaceIndex = j;
+                    break;
+                }
+
+                int k;
+                for (k = i + 1; k < n; k++) {
+                    if (frame[j] == pages[k]) {
+                        break;
+                    }
+                }
+
+                if (k == n) {
+                    replaceIndex = j;
+                    break;
+                }
+
+                if (k > farthest) {
+                    farthest = k;
+                    replaceIndex = j;
+                }
+            }
+
+            frame[replaceIndex] = pages[i];
+            pageFaults++;
+            cout << "Page fault: " << pages[i] << endl;
+        } else {
+            cout << "Page hit: " << pages[i] << endl;
+        }
+    }
+
+    cout << "Total Page Faults: " << pageFaults << endl;
+}
+
+int main() {
+    /* You can take input for pages and framesize from user and pass it to the function accordingly*/
+    int pages[] = {7, 0, 1, 2, 0, 3, 0, 4, 2, 3, 0, 3, 2, 1, 2,0, 1, 7, 0, 1};
+    int n = sizeof(pages) / sizeof(pages[0]);
+    int frameSize = 3;
+
+    OptimalPageReplacement(pages, n, frameSize);
+
+    return 0;
+}
