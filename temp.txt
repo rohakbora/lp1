@@ -1,0 +1,152 @@
+TempSensor
+
+int tempPin = A0;   
+int val;             
+float v;             
+float cel;           
+int ledPin = 7;      
+
+void setup() {
+  pinMode(ledPin, OUTPUT);  
+  Serial.begin(9600);       
+}
+
+void loop() {
+  val = analogRead(tempPin);  
+  v = val * (5.0 / 1023.0);   
+  cel = (v - 0.5) * 100;      
+  Serial.print("TEMPERATURE: ");
+  Serial.print(cel);
+  Serial.println(" C");
+
+  if (cel > 50) {
+    digitalWrite(ledPin, HIGH);  
+    delay(1000);                  
+    digitalWrite(ledPin, LOW);   
+    delay(1000);               
+  } else {
+    digitalWrite(ledPin, LOW);
+  }
+
+  delay(1000);
+}
+
+//Alternate
+
+#include <dht.h>
+
+#define dht_apin A0 // DHT11 is connected to A0
+#define LED 13 // LED is connected to pin 13
+
+dht DHT;
+
+void setup() {
+  pinMode(LED, OUTPUT); // Set LED pin as output
+  Serial.begin(9600); // Initialize serial communication at 9600 baud rate
+  delay(1000); // Initial delay of 1 second
+}
+
+void loop() {
+  DHT.read11(dht_apin); // Read humidity and temperature from DHT11 sensor
+
+  Serial.print("Current humidity = ");
+  Serial.print(DHT.humidity);
+  Serial.print("% ");
+  Serial.print("temperature = ");
+  Serial.print(DHT.temperature);
+  Serial.println("C");
+
+  if (DHT.temperature > 30) {
+    digitalWrite(LED, HIGH); // Turn on LED if temperature exceeds 30°C
+  } else {
+    digitalWrite(LED, LOW); // Turn off LED if temperature is 30°C or below
+  }
+
+  delay(1000); // Delay of 1 second before next reading
+}
+
+//Alternate
+
+#include <dht11.h>
+const int buzzer = 9;
+#define DHT11PIN 4
+
+dht11 DHT11;
+
+void  setup()
+{
+  Serial.begin(9600);
+  pinMode(13, OUTPUT);
+  pinMode(buzzer, OUTPUT);
+ 
+}
+
+void loop()
+{
+  Serial.println();
+
+  int chk = DHT11.read(DHT11PIN);
+
+  Serial.print("Humidity (%): ");
+  Serial.println((float)DHT11.humidity, 2);
+
+  Serial.print("Temperature  (C): ");
+  Serial.println((float)DHT11.temperature, 2);
+
+  delay(2000);
+  if(DHT11.temperature>20)
+  {
+    tone(buzzer, 1000); // Send 1KHz sound signal...
+    delay(1000);        // ...for 1 sec
+    noTone(buzzer);     // Stop sound... 
+    delay(1000); 
+  }
+
+}
+
+
+//Alternate
+
+#include <Adafruit_Sensor.h>
+
+#include <DHT.h>
+
+#define DHTPIN 6       // Pin which is connected to the DHT sensor
+#define DHTTYPE DHT11  // DHT 11
+#define LED 13
+
+DHT dht(DHTPIN, DHTTYPE); // Create an instance of DHT class
+
+void setup()
+{
+  Serial.begin(9600);
+  dht.begin(); // Initialize the sensor
+  pinMode(LED,OUTPUT);
+}
+
+void loop() 
+{
+  delay(1000); // Wait a few seconds between measurements
+
+  // Read temperature as Celsius
+  float temperature = dht.readTemperature();
+  // Read humidity
+  float humidity = dht.readHumidity();
+
+  Serial.print("Temperature: ");
+  Serial.print(temperature);
+  Serial.println(" *C");
+
+  Serial.print("Humidity: ");
+  Serial.print(humidity);
+  Serial.println(" %");
+
+  if(temperature>23)
+  {
+    digitalWrite(LED, HIGH);
+  }
+  else
+  {
+    digitalWrite(LED, LOW);
+  }
+}
